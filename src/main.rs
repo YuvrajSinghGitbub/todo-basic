@@ -7,15 +7,38 @@ struct Todo {
 
 fn main() {
     let mut choice: String = String::new();
-    give_options();
-    enter_choice(&mut choice);
 
-    // TODO:
-    // 1. function for each entered choice
-    // 2. how to use the Todo struct
+    loop {
+        give_options();
+        enter_choice(&mut choice);
+
+        match choice.trim() {
+            "1" => {
+                println!("new todo item added");
+            }
+            "2" => {
+                println!("viewing the old todo items");
+            }
+            "3" => {
+                println!("removing the old items");
+            }
+            "4" => {
+                println!("marking the old items as done");
+            }
+            "5" => {
+                break;
+            }
+            _ => {
+                println!("invalid choice. entered choice: -{choice}-");
+            }
+        }
+
+        choice.clear();
+    }
 }
 
 fn give_options() {
+    println!();
     println!("Enter your choice");
     println!("1. Enter a new todo item:");
     println!("2. View old todo items:");

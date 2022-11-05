@@ -1,4 +1,4 @@
-use std::io;
+use std::{io, num::ParseIntError};
 
 #[allow(dead_code)]
 /// Struct defining the pending tasks as a vector.
@@ -50,21 +50,34 @@ impl Todo {
     /// from = 1: removes from the pending vec.
     /// from = 2: removes from the doing vec.
     /// from = 3: removes from the done vec.
-    pub fn remove_task(&self, from: i8, task_id: i32) {
+    pub fn remove_task(&mut self, from: String, task_id: String) -> Result<(), ParseIntError> {
+        let from = from.parse::<i32>()?;
+        let task_id = task_id.parse::<usize>()?;
+
         match from {
             1 => {
-                println!("removing from pending");
+                println!("Removing from pending");
+                if task_id < self.pending.len() {
+                    self.pending.remove(task_id);
+                    println!("Task removed.");
+                } else {
+                    println!("Invalid task id");
+                }
             }
             2 => {
-                println!("removing from doing vec")
-            }
-            3 => {
-                println!("removing for done vec");
+                println!("Removing from doing vec");
+                if task_id < self.doing.len() {
+                    self.pending.remove(task_id);
+                    println!("Task removed.");
+                } else {
+                    println!("Invalid task id");
+                }
             }
             _ => {
-                println!("invalid from input");
+                println!("Please enter from where you want to remove task correctly");
             }
         }
+        Ok(())
     }
 
     /// Adds a pending task from pending vec to doing vec based on task_id
@@ -91,7 +104,7 @@ fn main() {
                 let mut task: String = String::new();
 
                 // get the task ->
-                println!("Enter your task:");
+                println!("--> Enter your task:");
                 match io::stdin().read_line(&mut task) {
                     Err(why) => println!("Error occured while reading task number. Error: {why}"),
                     Ok(_) => {
@@ -103,7 +116,22 @@ fn main() {
                 todo1.view_tasks();
             }
             "3" => {
-                println!("removing the old items");
+                let mut from: String = String::new();
+                let mut task_id: String = String::new();
+
+                println!("--> Enter from where you want to remove task:");
+                println!("--> 1: from pending:\n--> 2: from doing");
+                io::stdin().read_line(&mut from).unwrap();
+
+                println!("--> Tasks:");
+                todo1.view_tasks();
+                println!("--> Enter task id:");
+                io::stdin().read_line(&mut task_id).unwrap();
+
+                match todo1.remove_task(from.trim().to_owned(), task_id.trim().to_owned()) {
+                    Ok(()) => println!("Task removes successfully"),
+                    Err(why) => println!("Error occured while parsing: {}", why),
+                };
             }
             "4" => {
                 println!("marking pending item as doing");

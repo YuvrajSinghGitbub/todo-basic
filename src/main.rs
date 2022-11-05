@@ -49,7 +49,6 @@ impl Todo {
     /// Removes any task based on its id from any task vecs
     /// from = 1: removes from the pending vec.
     /// from = 2: removes from the doing vec.
-    /// from = 3: removes from the done vec.
     pub fn remove_task(&mut self, from: String, task_id: String) -> Result<(), ParseIntError> {
         let from = from.parse::<i32>()?;
         let task_id = task_id.parse::<usize>()?;
@@ -81,10 +80,31 @@ impl Todo {
     }
 
     /// Adds a pending task from pending vec to doing vec based on task_id
-    pub fn mark_doing(&self, task_id: i32) {}
+    pub fn mark_doing(&mut self, task_id: String) -> Result<(), ParseIntError> {
+        let task_id = task_id.parse::<usize>()?;
+        match task_id > self.pending.len() {
+            true => {
+                let removed = self.pending.remove(task_id);
+                self.doing.push(removed);
+            }
+            false => println!("Invalid task id"),
+        }
+        Ok(())
+    }
 
     /// Removes the task from the doing vector and adds it to the done vec.
-    pub fn mark_done(&self) {}
+    pub fn mark_done(&mut self, task_id: String) -> Result<(), ParseIntError> {
+        let task_id = task_id.parse::<usize>()?;
+
+        match task_id > self.doing.len() {
+            true => {
+                let removed = self.pending.remove(task_id);
+                self.done.push(removed);
+            }
+            false => println!("Invalid task id"),
+        }
+        Ok(())
+    }
 }
 
 fn main() {
@@ -134,10 +154,24 @@ fn main() {
                 };
             }
             "4" => {
-                println!("marking pending item as doing");
+                let mut task_id: String = String::new();
+
+                println!("--> Enter the pending task id you want to mark as doing:");
+                io::stdin().read_line(&mut task_id).unwrap();
+                match todo1.mark_doing(task_id.trim().to_owned()) {
+                    Ok(()) => println!("Task moved to doing successfully"),
+                    Err(why) => println!("Error occured while parsing: {}", why),
+                }
             }
             "5" => {
-                println!("marking the old items as done");
+                let mut task_id: String = String::new();
+
+                println!("--> Enter the doing task id you want to mark as done:");
+                io::stdin().read_line(&mut task_id).unwrap();
+                match todo1.mark_doing(task_id.trim().to_owned()) {
+                    Ok(()) => println!("Task moved to done successfully"),
+                    Err(why) => println!("Error occured while parsing: {}", why),
+                }
             }
             "6" => {
                 break;

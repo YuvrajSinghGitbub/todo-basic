@@ -82,12 +82,13 @@ impl Todo {
     /// Adds a pending task from pending vec to doing vec based on task_id
     pub fn mark_doing(&mut self, task_id: String) -> Result<(), ParseIntError> {
         let task_id = task_id.parse::<usize>()?;
-        match task_id > self.pending.len() {
-            true => {
-                let removed = self.pending.remove(task_id);
-                self.doing.push(removed);
-            }
-            false => println!("Invalid task id"),
+
+        if task_id > self.pending.len() {
+            println!("Task id out of bounds. Please enter correctly...");
+        } else {
+            let removed: String = self.pending.remove(task_id);
+            self.doing.push(removed);
+            println!("Task marked as doing...");
         }
         Ok(())
     }
@@ -96,12 +97,12 @@ impl Todo {
     pub fn mark_done(&mut self, task_id: String) -> Result<(), ParseIntError> {
         let task_id = task_id.parse::<usize>()?;
 
-        match task_id > self.doing.len() {
-            true => {
-                let removed = self.pending.remove(task_id);
-                self.done.push(removed);
-            }
-            false => println!("Invalid task id"),
+        if task_id > self.doing.len() {
+            println!("Task id out of bounds. Please enter correctly...");
+        } else {
+            let removed: String = self.doing.remove(task_id);
+            self.done.push(removed);
+            println!("Task marked as doing...");
         }
         Ok(())
     }

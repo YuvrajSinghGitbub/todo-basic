@@ -19,7 +19,7 @@ pub mod todo {
             let path: &Path = Path::new(&todo_path);
 
             match path.exists() {
-                // if the pathd does not exist ->
+                // if the path does not exist ->
                 false => Todo {
                     pending: Vec::new(),
                     doing: Vec::new(),
@@ -31,9 +31,10 @@ pub mod todo {
                     // load the file as a json string ->
                     let mut buffer: String = String::new();
                     let mut todo_file: File = File::open(path).unwrap();
-                    todo_file.read_to_string(&mut buffer).unwrap();
-                    println!("\nReading from todo file...");
 
+                    todo_file.read_to_string(&mut buffer).unwrap();
+
+                    println!("\nReading from todo file...");
                     println!("Contents of todo file: \n{}", buffer);
 
                     // parsing the file content ->
@@ -46,31 +47,33 @@ pub mod todo {
         /// Takes in the task as a string and pushes it to the pending queue of Todo struct.
         pub fn create_task(&mut self, task: String) {
             self.pending.push(task);
-            println!("--> Task added successfully.")
+            println!("--> Task added successfully.\n")
         }
 
         /** Gives a view of the task present in pending, doing, and done queues to the Todo struct.*/
         pub fn view_tasks(&self) {
-            println!("------ Pending tasks ------");
+            println!("Tasks:");
+            println!("------ \t Pending tasks");
             for (task_no, task) in self.pending.iter().enumerate() {
                 print!("`{}: {}`, ", task_no, task);
             }
 
-            println!("\n------ Tasks currently doing ------");
+            println!("\n\n------\tTasks currently doing");
             for (task_no, task) in self.doing.iter().enumerate() {
                 print!("`{}: {}`, ", task_no, task);
             }
 
-            println!("\n------ Tasks done ------");
+            println!("\n\n------\tTasks done");
             for (task_no, task) in self.done.iter().enumerate() {
                 print!("`{}: {}`, ", task_no, task);
             }
+            println!("\n\n")
         }
 
         /// Marks a task in the pending queue as doing by:
         /// 1. removing the task from the pending queue, then
         /// 2. pushing it to the doing queue.
-        pub fn do_task(&mut self, task_id: usize) {
+        pub fn do_task(&mut self, task_id: String) {
             // if task_id > self.pending.len() {
             //     println!("--- Task id out of bounds. Please enter correctly ---");
             // } else {
@@ -78,10 +81,19 @@ pub mod todo {
             //     self.doing.push(removed);
             // }
 
+            // Try to parse the task_id:
+            let task_id = task_id.trim().parse::<isize>().unwrap_or(-1);
+
+            // check if the parsing task_id failed ->
+            if task_id < 0 {
+                println!("Please enter task_id correctly...");
+                return;
+            }
+
             // in rust's match pattern -->
-            match task_id > self.pending.len() {
+            match (task_id as usize) > self.pending.len() {
                 true => {
-                    let removed: String = self.pending.remove(task_id);
+                    let removed: String = self.pending.remove(task_id as usize);
                     self.doing.push(removed);
                 }
                 false => println!("--- Task id out of bounds. Please enter correctly ---"),
@@ -91,7 +103,7 @@ pub mod todo {
         /// Marks a task in the doing queue as done by:
         /// 1. removing the task from doing queue, then
         /// 2. pushing it to the done queue
-        pub fn mark_task_done(&mut self, task_id: usize) {
+        pub fn mark_task_done(&mut self, task_id: String) {
             // if task_id > self.doing.len() {
             //     println!("--- Task id out of bounds. Please enter correctly ---");
             // } else {
@@ -100,32 +112,52 @@ pub mod todo {
             //     println!("--- Task marked as doing ---");
             // }
 
+            // Try to parse the task_id:
+            let task_id = task_id.trim().parse::<isize>().unwrap_or(-1);
+
+            // check if the parsing task_id failed ->
+            if task_id < 0 {
+                println!("Please enter task_id correctly...");
+                return;
+            }
+
             // in rust's match pattern -->
-            match task_id > self.pending.len() {
+            match (task_id as usize) > self.pending.len() {
                 true => {
-                    let removed: String = self.pending.remove(task_id);
+                    let removed: String = self.pending.remove(task_id as usize);
                     self.doing.push(removed);
                 }
                 false => println!("--- Task id out of bounds. Please enter correctly ---"),
             }
         }
 
-        /// Removes a task fro the pending queue and/or from the doing queue.
-        pub fn remove_task(&mut self, task_id: usize, from: i8) {
-            match from {
-                1 => {
-                    if task_id < self.pending.len() {
+        /// Removes a task from the pending queue and/or from the doing queue.
+        pub fn remove_task(&mut self, task_id: String, from: String) {
+            // try to parse the task_id
+            let task_id = task_id.trim().parse::<isize>().unwrap_or(-1);
+
+            // check if the parsing task_id failed ->
+            if task_id < 0 {
+                println!("Please enter task_id correctly...");
+                return;
+            }
+
+            match from.trim() {
+                "1" => {
+                    if (task_id as usize) < self.pending.len() {
                         println!("--- Removing from pending ---");
-                        self.pending.remove(task_id);
+
+                        self.pending.remove(task_id as usize);
                         println!("--- Task removed ---");
                     } else {
                         println!("--- Invalid task id ---");
                     }
                 }
-                2 => {
-                    if task_id < self.doing.len() {
+                "2" => {
+                    if (task_id as usize) < self.doing.len() {
                         println!("--- Removing from doing vec ---");
-                        self.pending.remove(task_id);
+
+                        self.pending.remove(task_id as usize);
                         println!("--- Task removed ---");
                     } else {
                         println!("--- Invalid task id ---");
@@ -166,15 +198,15 @@ pub mod helper {
      * Also takes in the choice from the standard input. */
     pub fn give_choices(choice: &mut String) {
         println!("Enter your choice:");
-        println!("1. Create new task:");
-        println!("2. View tasks:");
-        println!("3. Mark task as doing:");
-        println!("4. Mark task as done:");
-        println!("5. Remove task:");
-        println!("6. Quit:");
+        println!("\t1. Create new task:");
+        println!("\t2. View tasks:");
+        println!("\t3. Mark task as doing:");
+        println!("\t4. Mark task as done:");
+        println!("\t5. Remove task:");
+        println!("\t6. Quit:");
 
         match io::stdin().read_line(choice) {
-            Ok(choice) => println!("--> Choice entered: {}", choice),
+            Ok(_) => println!("--> Choice entered: {}", choice),
             Err(why) => {
                 println!("--> Error while parsing the entered choice.");
                 println!("--> Error: {}", why)

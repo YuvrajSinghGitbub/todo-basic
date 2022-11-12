@@ -29,7 +29,13 @@ fn main() {
                 let mut task_id: String = String::new();
 
                 println!("--> Task id to mark as doing:");
-                io::stdin().read_line(&mut task_id);
+                match io::stdin().read_line(&mut task_id) {
+                    Err(why) => {
+                        println!("Failed to read the task, pleae try again");
+                        println!("Error: {}", why);
+                    }
+                    Ok(_) => println!("-----------------------------------------------"),
+                }
 
                 todo1.do_task(task_id);
             }
@@ -37,7 +43,13 @@ fn main() {
                 let mut task_id: String = String::new();
 
                 println!("--> Task id to mark as done:");
-                io::stdin().read_line(&mut task_id);
+                match io::stdin().read_line(&mut task_id) {
+                    Err(why) => {
+                        println!("Failed to read the task, pleae try again");
+                        println!("Error: {}", why);
+                    }
+                    Ok(_) => println!("-----------------------------------------------"),
+                }
 
                 todo1.mark_task_done(task_id);
             }

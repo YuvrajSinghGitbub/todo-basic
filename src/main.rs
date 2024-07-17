@@ -2,6 +2,7 @@ use std::io;
 use todo_basic::{helper::give_choices, todo::Todo};
 
 fn main() {
+    // for testing purposes
     let mut choice: String = String::new();
     let mut todo1: Todo = Todo::new();
 
